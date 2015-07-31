@@ -107,6 +107,10 @@ REM 验证可选组件是否为映像的一部分(查看程序包结果列表)
 	DISM /Get-Packages /Image:"mount"
 	
 REM 添加多语言
+REM 查看当前语言
+	DISM /Image:"mountpoint" /Get-Intl
+REM 删除语言包
+	DISM /Image:"mountpoint" /Remove-Package /PackagePath:"package.cab"
 REM 列出可选组件
 	DISM /Get-Packages /Image:"mountpoint"
 REM 添加相应语言包，包括基本Windows PE 语言包
@@ -120,6 +124,14 @@ REM 在Windows PE中切换语言
 	wpeutil setmuilanguage
 REM window安装过程中添加更新的驱动程序
 	drvload inf_path 
+REM 预安装应用
+	Dism /Image:"mountpoint" /Add-ProvisionedAppxPackage /PackagePath:appxpackage /DependencyPackagePath:appxpackagedependency
+REM 使用应答文件删除语言包
+	<package action="remove">
+		<assemblyIdentity name="Microsoft-Windows-LanguagePack-Package" version="6.0.5714.0" processorArchitecture="x86" publicKeyToken="31bf3856ad364e35" language="en-US" />
+	</package>
+	Dism /Image:C:\test\offline /Apply-Unattend:C:\test\answerfiles\myunattend.xml
+	Dism /Commit-Image /MountDir:C:\test\offline
 	
 REM Wpeutil(每行只能接受一个命令)
 	Wpeutil Shutdown
@@ -145,3 +157,6 @@ REM https://technet.microsoft.com/zh-cn/library/hh825209.aspx
 
 REM REFERENCE
 REM https://msdn.microsoft.com/en-us/library/windows/hardware/ff554690(v=vs.85).aspx
+
+REM ADK 10
+REM https://msdn.microsoft.com/zh-cn/windows/hardware/dn913721.aspx

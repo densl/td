@@ -1,0 +1,6 @@
+
+grep -rn patter files
+diff -uN file1 file2 > a.patch
+
+//∫œ≤¢Ω‚—π
+cat xx.tar.bz2.a* | tar -jx

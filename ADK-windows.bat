@@ -23,6 +23,11 @@ REM 卸载镜像并保存
 REM 6
 REM 写入产品序列号
 	call DISM /Image:w: /Set-ProductKey:XXXX-XXXX-XXXX-XXXX-XXXX
+
+REM 7
+REM 删除驱动
+	DISM /image:d:\test /Remove-Driver /driver:k:\oem1.inf_path
+
 	
 REM ***************************************************
 REM IMAGEX
@@ -72,6 +77,10 @@ REM INSTALL TO MEDIA
 REM APPLY IMAGES
 	DISM /Apply-Image /ImageFile:"d:\install.swm" /SWMFile:install*.swm /Index:1 /ApplyDir:w:\ /Compact /ScratchDir:"W:\recycler\scratch"
 	
+REM 还原挂起操作
+	DISM /Image:"imagePath" /cleanup-image /RevertPendingActions
+REM 还原镜像
+	DISM /Image:"imagePath" /Cleanup-image /RestoreHealth
 REM 4
 REM SET BOOT FILE
 	BCDboot P:\Windows /s P: /f ALL
@@ -111,6 +120,7 @@ REM 查看当前语言
 	DISM /Image:"mountpoint" /Get-Intl
 REM 删除语言包
 	DISM /Image:"mountpoint" /Remove-Package /PackagePath:"package.cab"
+	Dism /Image:"mountpoint" /Remove-Package /PackageName:Microsoft.Windows.Calc.Demo~6595b6144ccf1df~x86~en~1.0.0.0
 REM 列出可选组件
 	DISM /Get-Packages /Image:"mountpoint"
 REM 添加相应语言包，包括基本Windows PE 语言包
@@ -145,7 +155,13 @@ REM 卸载映像，并放弃更改
 	DISM /Unmount-Image /MOuntDir:"mountpoint" /discard
 REM 清除与已装载的映像相关联的资源
 	DISM /Cleanup-Mountpoints
+
+REM 开启高性能模式
+	powercfg /s 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c
 	
+REM 捕获安装映像
+	Dism /Capture-Image /ImageFile:C:\myimage.wim /CaptureDir:c:\ /Compress:fast /CheckIntegrity /ImageName:"x86_Ultimate" /ImageDescription:"x86 Ultimate Compressed"
+
 REM WINDOWS PE REFERENCES WEB
 REM https://technet.microsoft.com/zh-cn/library/hh824980.aspx
 
@@ -155,7 +171,7 @@ REM https://technet.microsoft.com/en-us/library/ff699026.aspx
 REM Sysprep REFERENCE
 REM https://technet.microsoft.com/zh-cn/library/hh825209.aspx
 
-REM REFERENCE
+REM Driver REFERENCE
 REM https://msdn.microsoft.com/en-us/library/windows/hardware/ff554690(v=vs.85).aspx
 
 REM ADK 10

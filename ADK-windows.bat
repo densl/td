@@ -162,6 +162,69 @@ REM 开启高性能模式
 REM 捕获安装映像
 	Dism /Capture-Image /ImageFile:C:\myimage.wim /CaptureDir:c:\ /Compress:fast /CheckIntegrity /ImageName:"x86_Ultimate" /ImageDescription:"x86 Ultimate Compressed"
 
+REM Install Classic application
+REM Prepare ScanState -> Install app in Audit Mode -> Capture updates
+	ScanState /apps /ppkg classicApp.ppkg /o /c /v:13 /l:a.log
+    ScanState /apps /ppkg c:\Recovery\Customizations\usmt.ppkg /o /c /v:13 /l:a.log
+	
+REM ICD to combine the provisioning packages
+	icd /BuildImageFromWim /MediaPath:"IcdOutput" /SourceImage:install.wim /ImageIndex:1 /ProvisioningPackage:"a.ppkg"
+		/DeploymentConfigXml:DeploymentConfig.xml /CustomizationXML:Customizations.xml
+		
+REM Convert the image from .wim to .esd
+	DISM /Export-Image /SourceImageFile:"a.wim" /SourceIndex:1 /DestinationImageFile:"install.esd" /Compress:recovery
+	
+REM ICD: Windows Imaging and Configuration Designer
+REM Mount the windows image file
+	DISM /Mount-Image /ImageFile:install.wim /Index:1 /Mountdir:"mountdir" /Optimize
+	
+REM Cleanup the windows file
+	DISM /Cleanup-Image /ImagePath:"mountPath" /StartComponentCleanup /ResetBase /ScratchDir:temp
+ 
+REM 配置系统初始化恢复映像(default: install.wim)
+	reagentc /setosimage /path k:\source /index 3
+
+REM set RE environment
+	reagentc /SetReImage /path R:\Recovery\WindowsRE /target w:\windows
+
+REM 恢复映像权限
+	attrib r:\Recovery\Windowsre\winre.wim +s +h +a +r
+	
+REM Restrict the Write and Modify permissions
+	icacls e:\recoveryImage /inheritance:r /T
+	icacls e:\recoveryImage /grant:r SYSTEM:(F) /T
+	icacls e:\recoveryImage /grant:r *S-1-5-32-544:(F) /T	
+
+REM BCDBOOT
+	BCDBOOT w:\WINDOWS /s s: /f all
+REM Create windows partition
+	select disk ^0>>x:\winpart.txt
+	create partition efi size=100>>x:\winpart.txt
+	format quick fs=fat32 label="System">>x:\winpart.txt
+	assign letter="S">>x:\winpart.txt
+	create partition msr size=16>>x:\winpart.txt
+	create partition primary>>x:\winpart.txt
+	format quick fs=ntfs label="Windows">>x:\winpart.txt
+	assign letter="W">>x:\winpart.txt
+	shrink desired=800>>x:\winpart.txt
+	create partition primary>>x:\winpart.txt
+	format quick fs=ntfs label="Recovery">>x:\winpart.txt
+	assign letter="R">>x:\winpart.txt
+	set id="de94bba4-06d1-4d40-a16a-bfd50179d6ac">>x:\winpart.txt
+	gpt attributes=0x8000000000000001>>x:\winpart.txt
+	exit>>x:\WinPart.txt
+	diskpart /s x:\WinPart.txt
+
+REM hide driver
+	select volume=^1
+	attributes volume set hidden
+
+REM TIME
+	time /t
+	
+REM Return value
+	%errorlevel%
+	
 REM WINDOWS PE REFERENCES WEB
 REM https://technet.microsoft.com/zh-cn/library/hh824980.aspx
 

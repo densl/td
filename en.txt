@@ -1,0 +1,55 @@
+rollup	n.汇总
+provision	n.食品；供应；规定；条款；准备金
+		vt.向...供应食物
+provisional	adj.暂时的
+provisionality	adv.暂时性；临时性
+provisionary	adj.暂定的
+scenarios		n.情节；情况
+scenario		n.剧本；情节梗概
+enrollment		n.注册；登记；入会
+enroll			v.登记；招收；入伍
+recruit			n.新成员；新兵
+				v.吸收（新成员）；征兵；招聘
+mandatory		n.受托管理者
+				adj.法定的；义务的；强制性的；受委托的
+quota			n.限额；配额；定额；最低票数
+approach		v.靠近；接近；要求；达到；动手处理
+				n.途径；方法；接近；要求；态度；意见
+conversely		adv.相反地
+leverage		n.杠杆作用；力量；影响
+				v.对...产生影响；举债经营；补充(金钱等)
+refurbish		vt.刷新；擦亮
+pristine		adj.原始的；未受损的
+crypto			adj.秘密的；密码术的
+cryptographic	adj.密码的
+erasure			n.擦除；抹掉
+thorough		adj.彻底的，完全的，详尽的
+remnant			n.残余；残存；零头
+				adj.剩余的
+criteria		n.标准；尺度；准则
+trim			v.修剪
+				adj.整洁；均匀
+sanitize		vt.使安全；消毒；使无害
+illustrate		v.说明；解释
+facilitate		vt.促进；帮助；使容易
+
+
+				
+		
+
+
+
+
+
+
+
+
+
+professional words.
+
+
+
+
+
+
+

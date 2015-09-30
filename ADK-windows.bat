@@ -160,7 +160,7 @@ REM 开启高性能模式
 	powercfg /s 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c
 	
 REM 捕获安装映像
-	Dism /Capture-Image /ImageFile:C:\myimage.wim /CaptureDir:c:\ /Compress:fast /CheckIntegrity /ImageName:"x86_Ultimate" /ImageDescription:"x86 Ultimate Compressed"
+	Dism /Capture-Image /ImageFile:C:\myimage.wim /CaptureDir:c:\ /Compress:fast /CheckIntegrity /Name:"x86_Ultimate" /Description:"x86 Ultimate Compressed"
 
 REM Install Classic application
 REM Prepare ScanState -> Install app in Audit Mode -> Capture updates
@@ -179,7 +179,8 @@ REM Mount the windows image file
 	DISM /Mount-Image /ImageFile:install.wim /Index:1 /Mountdir:"mountdir" /Optimize
 	
 REM Cleanup the windows file
-	DISM /Cleanup-Image /ImagePath:"mountPath" /StartComponentCleanup /ResetBase /ScratchDir:temp
+	DISM /Cleanup-Image /Image:"mountPath" /StartComponentCleanup /ResetBase /ScratchDir:temp
+	DISM /Image:xx /Cleanup-Image /StartComponentCleanup /ResetBase
  
 REM 配置系统初始化恢复映像(default: install.wim)
 	reagentc /setosimage /path k:\source /index 3
@@ -225,6 +226,43 @@ REM TIME
 REM Return value
 	%errorlevel%
 	
+	
+REM desktop computer
+Windows Registry Editor Version 5.00
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\ClassicStartMenu]
+"{450D8FBA-AD25-11D0-98A8-0800361B1103}"=dword:00000000
+"{20D04FE0-3AEA-1069-A2D8-08002B30309D}"=dword:00000000
+"{208D2C60-3AEA-1069-A2D7-08002B30309D}"=dword:00000000
+"{871C5380-42A0-1069-A2EA-08002B30309D}"=dword:00000000
+"{645FF040-5081-101B-9F08-00AA002F954E}"=dword:00000000
+
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel]
+"{450D8FBA-AD25-11D0-98A8-0800361B1103}"=dword:00000000
+"{20D04FE0-3AEA-1069-A2D8-08002B30309D}"=dword:00000000
+"{208D2C60-3AEA-1069-A2D7-08002B30309D}"=dword:00000000
+"{871C5380-42A0-1069-A2EA-08002B30309D}"=dword:00000000
+"{645FF040-5081-101B-9F08-00AA002F954E}"=dword:00000000
+
+	
+REM mig_exclude.xml
+REM <?xml version="1.0" encoding="UTF-8"?>
+REM <migration urlid="http://www.microsoft.com/migration/1.0/migxmlext/allfiles">
+    REM <component type="Documents" context="System">
+        REM <displayName>sample_excludes</displayName>
+        REM <role role="Data">
+            REM <rules>
+              REM <unconditionalExclude>
+                REM <objectSet>
+                  REM <pattern type="File">%SystemDrive%\Recovery\* [*]</pattern>
+                REM </objectSet>
+              REM </unconditionalExclude>
+            REM </rules>
+        REM </role>
+    REM </component>
+REM </migration>
+
+
+
 REM WINDOWS PE REFERENCES WEB
 REM https://technet.microsoft.com/zh-cn/library/hh824980.aspx
 
@@ -239,3 +277,7 @@ REM https://msdn.microsoft.com/en-us/library/windows/hardware/ff554690(v=vs.85).
 
 REM ADK 10
 REM https://msdn.microsoft.com/zh-cn/windows/hardware/dn913721.aspx
+
+REM 捕获和应用 Windows、系统和恢复分区
+REM https://technet.microsoft.com/zh-cn/library/hh825041.aspx
+
